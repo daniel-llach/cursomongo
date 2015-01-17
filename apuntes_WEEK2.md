@@ -115,3 +115,8 @@ db.users.find( { friends : { $all : [ "Joe" , "Bob" ] }, favorites : { $in : [ "
 
 ## Queries with Dot Notation
 
+Para buscar dentro de un *key* dentro de un *object* se puede usar dot notation.. ejemplo: name : "email.work" como se especifica en el siguiente ejemplo:
+```
+db.users.find({ "email.work" : "richard@10gen.com" })
+```
+

@@ -61,3 +61,57 @@ asi si traeria los *score* entre 50 y 60:
 db.scores.find( { $and : [ { score : { $gt : 50 } }, { score : { $lt : 60 } } ] } );
 ```
 
+## Querying Inside Arrays
+
+tomando en cuenta la colecion *accounts* que contiene un array dentro del campo *favorites*
+
+```
+> db.accounts.find().pretty()
+{
+        "_id" : ObjectId("54bac6762ab59b100a36aba1"),
+        "name" : "George",
+        "favorites" : [
+                "ice cream",
+                "pretzels"
+        ]
+}
+{
+        "_id" : ObjectId("54bac6a02ab59b100a36aba2"),
+        "name" : "Howard",
+        "favorites" : [
+                "pretzels",
+                "beer"
+        ]
+}
+```
+
+Al hacer la siguiente query:
+```
+db.accounts.find( { favorites : "pretzels" } );
+```
+
+Entrega el resultado de ambos elementos, puesto que mongodb realiza busquedas polimorficas dentro de los arrays.
+
+Por cierto que se puede combinar con otro tipo de busquedas como este ejemplo:
+```
+db.accounts.find( { favorites : "pretzels", name : { $gt : "H" } } );
+```
+
+## Using $in and $all
+
+Para hacer busquedas de un campo que coincidan con varios elementos de un array se puede utilizar *$all* de la siguiente manera:
+```
+db.accounts.find( { favorites : { $all : ["pretzels", "beer"] }});
+```
+
+Para realizar una busqueda tipo array en vez de usar *$or* se puede usar *$in* de la siguiente manera:
+```
+db.accounts.find( { name : { $in : ["Howard", "John"] }});
+```
+Busca en collecion *users* en el campo *friends* que contenga "Joe" **y** "Bob" y que ademas en el campo *favorites* contenga "running" **o** "pickles"
+```
+db.users.find( { friends : { $all : [ "Joe" , "Bob" ] }, favorites : { $in : [ "running" , "pickles" ] } } )
+```
+
+## Queries with Dot Notation
+

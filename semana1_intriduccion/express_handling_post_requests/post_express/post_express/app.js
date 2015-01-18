@@ -1,11 +1,12 @@
 var express = require('express')
   , app = express()
-  , cons = require('consolidate');
+  , cons = require('consolidate')
+  , bodyParser = require('body-parser');
+
 
 app.engine('html', cons.swig);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/views');
-app.use(express.bodyParser());
 app.use(app.router);
 
 // Handler for internal server errors

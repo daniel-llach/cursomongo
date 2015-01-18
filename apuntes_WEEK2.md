@@ -207,3 +207,7 @@ para *update* un registro se debe indicar primero una query del elemento a modif
 > db.people.update( { name : "Smith" }, { name : "Thompson" , salary : 5000 })
 ```
 NO SE ACTUALIZAN LOS CAMPOS QUE NO SE DEFINEN !!!   en el caso anterior si el registro tuviese mas campos solo prevalece name y salary
+
+## Using the $set Command
+
+

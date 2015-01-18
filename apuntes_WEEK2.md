@@ -210,4 +210,71 @@ NO SE ACTUALIZAN LOS CAMPOS QUE NO SE DEFINEN !!!   en el caso anterior si el re
 
 ## Using the $set Command
 
+Cuando no se desea reemplazar a todos los del campo que se busca se utiliza *$set*
+```
+> db.people.update( { name : "Alice" }, { $set : { age : 30 } } )
+```
+
+Si se desea incrementar el valor en uno se puede usar *$inc*
+```
+> db.people.update( { name : "Alice" }, { $inc : { age : 1 } } )
+```
+
+## Using the $unset Command
+
+eliminar un campo con *$unset*
+```
+> db.people.update( { name : "Jones" } , { $unset : { profession : 1 } } )
+```
+
+## Using $push, $pop, $pull, $pushAll, $pullAll, $addToSet
+
+dada a siguiente *collection*
+```
+> db.arrays.insert( { _id : 0 , a : [ 1,2,3,4 ] } )
+WriteResult({ "nInserted" : 1 })
+> db.arrays.find()
+{ "_id" : 0, "a" : [ 1, 2, 3, 4 ] }
+> db.arrays.update( { _id : 0 } , { $set : { "a.2" : 5 } } )
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.arrays.find()
+{ "_id" : 0, "a" : [ 1, 2, 5, 4 ] }
+> 
+```
+agregar elemento en un array con *push* (se agrega al final)
+```
+> db.arrays.update( { _id : 0 } , { $push : { a : 6 } } )
+```
+elimina elemento de un array con *pop* (**1** elimina el ultimo y **-1** el primero)
+```
+> db.arrays.update( { _id : 0 } , { $pop : { a : 1 } } )
+```
+*push* de un array al final de un array
+```
+> db.arrays.update( { _id : 0 } , { $pushAll : { a : [ 7,8,9] } } )
+```
+*pull* elimina un elemento de cualquier lugar donde se encuentre
+```
+> db.arrays.update( { _id : 0 } , { $pull : { a : 5 } } )
+```
+*pullAll* elimina los elementos de un array en el array
+```
+> db.arrays.update( { _id : 0 } , { $pullAll : { a : [2, 4, 8] } } )
+```
+*addToSet* agrega un alemento al array sólo si este no existe
+```
+> db.arrays.update( { _id : 0 } , { $addToSet : { a : 5 } } )
+```
+*upsert* se usa cuando se desea agregar un campo nuevo si se desea actualizar y no existe
+```
+> db.people.update( { name : "George" } , { $set : { age : 40 } } , { upsert : true } )
+```
+
+## Multi-update
+*multi : true* al configurarlo se puede operar con update en multiples elementos. 
+En el siguiente caso cambia *title* (o agrega el campo si no existe) en todos los elementos ( **{}** )
+```
+> db.people.update( { } , { $set : { title : "Dr" } } , { multi : true} )
+```
+
 

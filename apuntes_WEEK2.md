@@ -120,3 +120,90 @@ Para buscar dentro de un *key* dentro de un *object* se puede usar dot notation.
 db.users.find({ "email.work" : "richard@10gen.com" })
 ```
 
+suponiendo los siguientes datos:
+```
+{ product : "Super Duper-o-phonic", 
+  price : 100000000000,
+  reviews : [ { user : "fred", comment : "Great!" , rating : 5 },
+              { user : "tom" , comment : "I agree with Fred, somewhat!" , rating : 4 } ],
+  ... }
+```
+Write a query that finds all products that cost more than 10,000 and that have a rating of 5 or better.
+```
+db.catalog.find({ price: {$gt:10000}, "reviews.rating" : {$gte:5} });
+```
+
+## Querying, Cursors
+
+Al realizar una query en el mongo shell se genera un cursor. Shell esta configurada para crear un cursor con el cual interactuar con los elementos del tree.
+si se busca lo siguiente, la shell contruira un cursor que imprime lo solicitado
+```
+db.people.find()
+```
+si uno se puede colgar de un cursor, se puede colgar de cualquier otro valor en el lenguaje de programa. (para evitar imprimir el resultado se usa la variable *null;* )
+```
+cur = db.people.find(); null;
+```
+*cur* ahora es una variable de un objeto *cursor*.
+*cur* tiene sus propios métodos.
+```
+cur.hasNext()
+```
+el metodo anterior habilita el comenado *next()* el cual permite visitar el proximo cursor en realacion al cursor actual
+```
+> cur.hasNext()
+true
+> cur.next()
+{
+        "_id" : ObjectId("54b583f02ab59b100a369fe0"),
+        "name" : "Smith",
+        "age" : 30,
+        "profession" : "hacker"
+}
+> 
+```
+con esto se puede programar secuencias de acciones sobre el *cur* como en python.
+```
+while (cur.hasNext()) printjson(cur.next());
+```
+para crear el *cur* con los datos donde se desea realizar la query se debe definir nuevamente como se hizo al comienzo:
+```
+cur = db.people.find(); null;
+```
+se puede configurar limites para que muestre resultados cada un numero dado
+```
+cur.limit(5); null;
+```
+con la propiedad sort se puede elegir el orden de las query
+```
+cur.sort( { name : -1 } ); null;
+```
+se puede hacer todo lo anterior de una
+```
+> cur = db.people.find(); null;
+null
+> cur.sort( { name : -1 } ).limit(3); null
+null
+> while (cur.hasNext()) printjson(cur.next());
+```
+Write a query that retrieves exam documents, sorted by score in descending order, skipping the first 50 and showing only the next 20.
+```
+db.scores.find( { type : "exam" } ).sort( { score : -1 } ).skip(50).limit(20)
+```
+
+## Counting Results
+```
+db.scores.count({ type : "exam"})
+```
+How would you count the documents in the scores collection where the type was "essay" and the score was greater than 90?
+```
+db.scores.count({ type: "essay", score : { $gt : 90 } })
+```
+
+## Wholesale Updating of a Document
+
+para *update* un registro se debe indicar primero una query del elemento a modifica y a continuación la o las variables a actualizar:
+```
+> db.people.update( { name : "Smith" }, { name : "Thompson" , salary : 5000 })
+```
+NO SE ACTUALIZAN LOS CAMPOS QUE NO SE DEFINEN !!!   en el caso anterior si el registro tuviese mas campos solo prevalece name y salary

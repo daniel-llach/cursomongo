@@ -277,4 +277,27 @@ En el siguiente caso cambia *title* (o agrega el campo si no existe) en todos lo
 > db.people.update( { } , { $set : { title : "Dr" } } , { multi : true} )
 ```
 
+Give every document with a score less than 70 an extra 20 points. 
+```
+> db.people.update( { } , { $set : { title : "Dr" } } , { multi : true} )
+```
+
+## Removing Data
+
+ejemplos de *remove*
+```
+> db.people.remove( { name : "Alice" } )    // solo Alice
+> db.people.remove( { name : {  $gt : "M" } } )    // nombres mas grandes que "M"
+> db.people.remove( { } )    // todos
+> db.people.drop()    // más rapido para remover todos
+> db.scores.remove( { score : { $lt : 60 } } )   // Delete every document with a score of less than 60. 
+```
+
+## getLastError (MongoDB v2.4 and earlier)
+
+muestra el ultimo error:
+```
+> db.runCommand( { getLastError : 1 } )
+```
+
 

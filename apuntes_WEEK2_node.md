@@ -197,5 +197,227 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
 
 ## Node.js Driver: Using Dot Notation
 
+para referirse a campos anidados... ej: people.boy.age
+```
+var MongoClient = require('mongodb').MongoClient;
 
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { 'media.oembed.type' : 'video' };
+
+    var projection = { 'media.oembed.url' : 1, '_id' : 0 };
+
+    db.collection('reddit_front').find(query, projection).each(function(err, doc) {
+        if(err) throw err;
+
+        if(doc == null) {
+            return db.close();
+        }
+
+        console.dir(doc);
+    });
+});
+```
+query que busca nombre de steve en la siguiente estructura:
+```
+{
+    'course' : 'M101JS',
+    'students' : [
+        {
+            'name' : 'Susan'
+        },
+        {
+            'name' : 'Steve'
+        }
+    ]
+}
+
+{"students.name" : "Steve"}
+```
+
+## Node.js Driver: Skip, Limit and Sort
+SORT SKIP LIMIT  // este es el orden
+
+ordena por *grade* (number) de manera ascendente y por *student* (string) de manera decendente
+
+* find( selector, projection, options) !
+
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var grades = db.collection('grades');
+
+    var options = { 'skip' : 1,
+                   'limit' : 4,
+                   'sort' : [['grade', 1], ['student', -1]] };
+    var cursor = grades.find({}, {}, options);
+
+    cursor.each(function(err, doc) {
+        if(err) throw err;
+        if(doc == null) {
+            return db.close();
+        }
+        console.dir(doc);
+    });
+});
+
+```
+
+## Node.js Driver: Inserting, _id
+
+insertar sin ID
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var doc = { 'student' : 'Calvin', 'age' : 6 };
+
+    db.collection('students').insert(doc, function(err, inserted) {
+        if(err) throw err;
+
+        console.dir("Successfully inserted: " + JSON.stringify(inserted));
+
+        return db.close();
+    });
+});
+
+## Node.js Driver: Updating
+
+Update single.
+hace una query con un *findOne* de campo *assigment*  que toma la primera que coincide y toma su *_id* luego hace otra query de *update* que busca el *_id* especifico y este lo actualiza colocandole una nueva fecha (*new Date()*)
+
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { 'assignment' : 'hw1' };
+
+    db.collection('grades').findOne(query, function(err, doc) {
+        if(err) throw err;
+        if(!doc) {
+            console.log('No documents for assignment ' + query.assignment + ' found!');
+            return db.close();
+        }
+
+        query['_id'] = doc['_id'];
+        doc['date_returned'] = new Date();
+
+        db.collection('grades').update(query, doc, function(err, updated) {
+            if(err) throw err;
+
+            console.dir("Successfully updated " + updated + " document!");
+
+            return db.close();
+        });
+    });
+});
+
+```
+
+*inplace*
+en una sola query pregunta por *assignment*  y actualiza la fecha por medio de un $set
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { 'assignment' : 'hw1' };
+    var operator = { '$set' : { 'date_returned' : new Date() } };
+
+    db.collection('grades').update(query, operator, function(err, updated) {
+        if(err) throw err;
+
+        console.dir("Successfully updated " + updated + " document!");
+
+        return db.close();
+    });
+});
+```
+
+*multi update*
+
+busca en todos ( *{}* ) eliminar ( *$unset* ) y habilita la opcion multiple con ( *'multi' : true* )
+
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { };
+    var operator = { '$unset' : { 'date_returned' : '' } };
+    var options = { 'multi' : true };
+
+    db.collection('grades').update(query, operator, options, function(err, updated) {
+        if(err) throw err;
+
+        console.dir("Successfully updated " + updated + " documents!");
+
+        return db.close();
+    });
+});
+
+```
+
+## Node.js Driver: Upserts
+
+Intenta reemplazar y si no existe inserta
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { 'estudent' : 'Frank', 'assignment' : 'hw1' };
+    var operator = { 'estudent' : 'Frank', 'assignment' : 'hw1', 'grade' : 100 };
+    // operator = { '$set' : {'date_returned' : new Date(), 'grade' : 100 } };   // otra manera con $set
+    var options = { 'upsert' : true };
+
+    db.collection('grades').update(query, operator, options, function(err, upserted) {
+        if(err) throw err;
+
+        console.dir("Successfully upserted " + upserted + " document!");
+
+        return db.close();
+    });
+});
+```
+
+*save*
+Hace lo mismo que el Upsert pero con menos codigo
+
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { 'assignment' : 'hw2' };
+
+    db.collection('grades').findOne(query, function(err, doc) {
+        if(err) throw err;
+
+        doc['date_returned'] = new Date();
+
+        db.collection('grades').save(doc, function(err, saved) {
+            if(err) throw err;
+
+            console.dir("Succesfully saved " + saved +  document!");
+
+            return db.close();
+        })
+    });
+});
+```
+
+## Node.js Driver: findAndModify
 

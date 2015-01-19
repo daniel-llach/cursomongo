@@ -421,3 +421,53 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
 
 ## Node.js Driver: findAndModify
 
+*Al usar *options = { 'new' : 'true' };* se generara un registro adicional si existe la query tiene aciertos.
+
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { 'name' : 'comments' };
+    var sort = [];
+    var operator = { '$inc' : { 'counter' : 1 } };
+    var options = { 'new' : true };
+
+    db.collection('counters').findAndModify(query, sort, operator, options, function(err, doc) {
+        if(err) throw err;
+
+        if (!doc) {
+            console.log("No counter found for comments.");
+        }
+        else {
+            console.log("Number of comments: " + doc.counter);
+        }
+
+        return db.close();
+    });
+});
+```
+
+## Node.js Driver: Remove
+
+* *$nin* quiere decir *no in*... $nin : []  // esto es igual a todo
+
+```
+var MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
+    if(err) throw err;
+
+    var query = { 'assignment' : 'hw3' };
+
+    db.collection('grades').remove(query, function(err, removed) {
+        if(err) throw err;
+
+        console.dir("Successfully updated " + removed + " documents!");
+
+        return db.close();
+    });
+});
+```
+

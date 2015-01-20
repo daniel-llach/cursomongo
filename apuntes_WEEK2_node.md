@@ -319,11 +319,11 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
         });
     });
 });
-
 ```
 
 *inplace*
 en una sola query pregunta por *assignment*  y actualiza la fecha por medio de un $set
+
 ```
 var MongoClient = require('mongodb').MongoClient;
 
@@ -365,12 +365,12 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
         return db.close();
     });
 });
-
 ```
 
 ## Node.js Driver: Upserts
 
 Intenta reemplazar y si no existe inserta
+
 ```
 var MongoClient = require('mongodb').MongoClient;
 

@@ -5,6 +5,7 @@ MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
     if(err) throw err;
 
     console.log('conectado');
+    console.log(db);
 
     // var data = db.collection('data');
 

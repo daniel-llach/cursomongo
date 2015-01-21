@@ -5,9 +5,10 @@ MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
     if(err) throw err;
 
     console.log('conectado');
-    console.log(db);
 
-    // var data = db.collection('data');
+    var data = db.collection('data');
+
+    console.log(data);
 
     // var options = { 'sort' : [['State', 1], ['Temperature', -1]] };
     // var cursor = data.find({}, {}, options);

@@ -9,11 +9,11 @@ MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
     var data = db.collection('data');
 
     var options = { 'sort' : [['State', 1], ['Temperature', -1]] };
-    var cursor = data.find({}, {}, options);
+    var cursor = data.find().sort({"State":1,"Temperature":-1});
 
     console.log(cursor.length);
 
-    cursor.each(function(err, doc) {
+    //cursor.each(function(err, doc) {
 
 
         // if(err) throw err;
@@ -23,5 +23,5 @@ MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
         //     db.collection('data').update({"_id": doc._id}, {"$set":{"month_high":true}});
         //     currentState = doc.State;
         // }
-    });
+    //});
 });

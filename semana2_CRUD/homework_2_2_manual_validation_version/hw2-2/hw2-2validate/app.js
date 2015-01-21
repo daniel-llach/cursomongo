@@ -13,7 +13,7 @@ MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
 
     cursor.each(function(err, doc) {
 
-        console.log(err);
+        console.log(err.toArray);
         // if(err) throw err;
         // if(doc == null) {
         //     return db.close();

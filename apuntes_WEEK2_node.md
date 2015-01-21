@@ -232,7 +232,6 @@ query que busca nombre de steve en la siguiente estructura:
         }
     ]
 }
-
 {"students.name" : "Steve"}
 ```
 
@@ -286,6 +285,7 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
         return db.close();
     });
 });
+```
 
 ## Node.js Driver: Updating
 
@@ -319,20 +319,17 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
         });
     });
 });
-
 ```
 
 *inplace*
 en una sola query pregunta por *assignment*  y actualiza la fecha por medio de un $set
+
 ```
 var MongoClient = require('mongodb').MongoClient;
-
 MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
     if(err) throw err;
-
     var query = { 'assignment' : 'hw1' };
     var operator = { '$set' : { 'date_returned' : new Date() } };
-
     db.collection('grades').update(query, operator, function(err, updated) {
         if(err) throw err;
 
@@ -349,7 +346,6 @@ busca en todos ( *{}* ) eliminar ( *$unset* ) y habilita la opcion multiple con 
 
 ```
 var MongoClient = require('mongodb').MongoClient;
-
 MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
     if(err) throw err;
 
@@ -359,34 +355,27 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
 
     db.collection('grades').update(query, operator, options, function(err, updated) {
         if(err) throw err;
-
         console.dir("Successfully updated " + updated + " documents!");
-
         return db.close();
     });
 });
-
 ```
 
 ## Node.js Driver: Upserts
 
 Intenta reemplazar y si no existe inserta
+
 ```
 var MongoClient = require('mongodb').MongoClient;
-
 MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
     if(err) throw err;
-
     var query = { 'estudent' : 'Frank', 'assignment' : 'hw1' };
     var operator = { 'estudent' : 'Frank', 'assignment' : 'hw1', 'grade' : 100 };
     // operator = { '$set' : {'date_returned' : new Date(), 'grade' : 100 } };   // otra manera con $set
     var options = { 'upsert' : true };
-
     db.collection('grades').update(query, operator, options, function(err, upserted) {
         if(err) throw err;
-
         console.dir("Successfully upserted " + upserted + " document!");
-
         return db.close();
     });
 });
@@ -397,22 +386,15 @@ Hace lo mismo que el Upsert pero con menos codigo
 
 ```
 var MongoClient = require('mongodb').MongoClient;
-
 MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
     if(err) throw err;
-
     var query = { 'assignment' : 'hw2' };
-
     db.collection('grades').findOne(query, function(err, doc) {
         if(err) throw err;
-
         doc['date_returned'] = new Date();
-
         db.collection('grades').save(doc, function(err, saved) {
             if(err) throw err;
-
             console.dir("Succesfully saved " + saved +  document!");
-
             return db.close();
         })
     });
@@ -425,25 +407,20 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
 
 ```
 var MongoClient = require('mongodb').MongoClient;
-
 MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
     if(err) throw err;
-
     var query = { 'name' : 'comments' };
     var sort = [];
     var operator = { '$inc' : { 'counter' : 1 } };
     var options = { 'new' : true };
-
     db.collection('counters').findAndModify(query, sort, operator, options, function(err, doc) {
         if(err) throw err;
-
         if (!doc) {
             console.log("No counter found for comments.");
         }
         else {
             console.log("Number of comments: " + doc.counter);
         }
-
         return db.close();
     });
 });
@@ -455,17 +432,12 @@ MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
 
 ```
 var MongoClient = require('mongodb').MongoClient;
-
 MongoClient.connect('mongodb://localhost:27017/course', function(err, db) {
     if(err) throw err;
-
     var query = { 'assignment' : 'hw3' };
-
     db.collection('grades').remove(query, function(err, removed) {
         if(err) throw err;
-
         console.dir("Successfully updated " + removed + " documents!");
-
         return db.close();
     });
 });

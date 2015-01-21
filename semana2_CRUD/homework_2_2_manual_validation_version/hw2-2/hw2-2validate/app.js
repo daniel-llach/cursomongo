@@ -1,27 +1,35 @@
-var MongoClient = require('mongodb').MongoClient;
-var currentState;
+'use strict';
 
-MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
-    if(err) throw err;
+var mongodb = require('mongodb'),
+    db,
+    currentState,
+    cursorExhausted = false,
+    updatesPending = 0;
 
-    console.log('conectado');
+mongodb.MongoClient.connect('mongodb://localhost:27017/weather', connect);
 
-    var data = db.collection('data');
+function connect (err, database) {
+    db = database;
+    db.collection('data').find().sort({"State":1,"Temperature":-1}).each(checkTemperature);
+}
 
-    var options = { 'sort' : [['State', 1], ['Temperature', -1]] };
-    var cursor = data.find().sort({"State":1,"Temperature":-1});
-
-    console.log(cursor);
-
-    //cursor.each(function(err, doc) {
-
-
-        // if(err) throw err;
-        // if(doc == null) {
-        //     return db.close();
-        // }else if(currentState == null || currentState != doc.State){
-        //     db.collection('data').update({"_id": doc._id}, {"$set":{"month_high":true}});
-        //     currentState = doc.State;
-        // }
-    //});
-});
+function checkTemperature (err, doc) {
+    if(err) {
+        console.log('Cursor error')
+    }
+    if(doc == null) {
+        cursorExhausted = true;
+    } else if(currentState == null || currentState != doc.State) {
+        db.collection('data').update({"_id":doc._id},{"$set":{"month_high":true}}, function(err, updated){
+           updatesPending--;
+           if(err) {
+               console.log('Doc update error:' + err);
+           }
+           if(cursorExhausted && updatesPending == 0) {
+               return db.close();
+           }
+        });
+        currentState = doc.State;
+        updatesPending++;
+    }
+}

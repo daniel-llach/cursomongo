@@ -11,9 +11,11 @@ MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
     var options = { 'sort' : [['State', 1], ['Temperature', -1]] };
     var cursor = data.find({}, {}, options);
 
+    console.log(cursor.length);
+
     cursor.each(function(err, doc) {
 
-        console.log(doc.length);
+
         // if(err) throw err;
         // if(doc == null) {
         //     return db.close();

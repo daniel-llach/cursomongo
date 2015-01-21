@@ -1,4 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
+var currentState;
 
 MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
     if(err) throw err;
@@ -12,7 +13,9 @@ MongoClient.connect('mongodb://localhost:27017/weather', function(err, db) {
         if(err) throw err;
         if(doc == null) {
             return db.close();
+        }else if(currentState == null || currentState != doc.State){
+            db.collection('data').update({"_id": doc._id}, {"$set":{"month_high":true}});
+            currentState = doc.State;
         }
-        console.dir(doc);
     });
 });

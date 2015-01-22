@@ -44,5 +44,84 @@ R: Keeping your data consistent even though MongoDB lacks foreign key constraint
 
 1.-Se puede "relacionar" con id uno de otro.. o incluir todo el objeto resumen en employee o al revés
 
-criterio: frecuencia de acceso
+criterios
+1.- frecuencia de acceso
+2.- Tamaño de los items  (máximo tamaño de una COLLECTION 16 megas!  ?)
+3.- Atomicidad de los datos
+
+P: What's a good reason you might want to keep two documents that are related to each other one-to-one in separate collections? Check all that apply.
+R: Because the combined size of the documents would be larger than 16MB
+
+## One to Many Relations 
+
+Ciudad : persona(S)
+
+*true linking*
+
+```
+// People
+{
+  name: "Dan",
+  city: "Valpo",
+}
+.
+.
+
+// City
+{
+  _id: "Valpo",
+  .
+  .
+}
+```
+
+*one to few*
+
+```
+// Post
+{
+  name: "ble",
+  coments: [
+    {
+      title: "Ble"
+    }
+    .
+    .
+  ]
+}
+```
+
+## Many to Many Relations 
+
+1.- Books: authors
+2.- students: teachers
+
+*few to few*
+```
+// Books
+_id: 12,
+title: "El título"
+authors: [27,43,4]
+.
+.
+
+// Authors
+_id: 27,
+author_name: Juanito,
+books: [12,2,31]
+.
+.
+```
+
+## Multikeys (indexes)
+
+
+
+
+
+
+
+
+
+
 

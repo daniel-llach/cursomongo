@@ -115,9 +115,72 @@ books: [12,2,31]
 
 ## Multikeys (indexes)
 
+```
+>db.students.find()
+{"_id" : 0, "name" : "Andrew Erickson", "teachers": [0,1] }
+.
+.
+>db.teachers.find()
+{"_id" : 0, "name" : "Mark Horowitz" }
+.
+.
+>db.students.ensureIndex({'teachers':1})
+{
+  "CreatedCollectionAutomatically": false,
+  "numIndexesBefore" : 1,
+  "numIndexesAfter" : 2,
+  "ok" : 1
+}
+>db.students.find({'teachers':{$all:[0,1]}})
+{"_id": 0, "name": "Andrew Erickson", "teachers" : [0,1] }
+.
+.
+>db.students.find({'teachers':{$all:[0,1]}}).explain()  // explica como realizo la query
+{
+  "cursor": "BtreeCursor teachers_1",
+  "isMultiKey": true,  // true!
+  "nScannedObjects": 3,
+  "nScanned": 3,
+  "nScannedObjectsAllPlans" : 3,
+  "nScannedAllPlans" : 9,
+  "scanAndOrder": false,
+  "nYields": 0,
+  "nChunkSkips": 0,
+  "indexBounds": {
+    .
+    .
+  }
+}
+```
+
+## Benefits of Embedding
+
+EL BENEFICIO ES PERFORMANCE !!
+
+1.- mejora en performance de lectura
+2.- un solo viaje a al BD
 
 
+## Trees 
 
+Se coloca un array con los _id de los ancestros a cada producto y asi se genera una categoría árbol.
+
+P: Given the following typical document for a e-commerce category hierarchy collection called categories
+```
+{
+  _id: 34,
+  name : "Snorkeling",
+  parent_id: 12,
+  ancestors: [12, 35, 90]
+}
+```
+R: db.categories.find({ancestors:34})
+
+## When to Denormalize
+
+1.- 1:1  // no embed
+2.- 1:many // embed from many to 1
+3.- many:many  // link
 
 
 
